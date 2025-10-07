@@ -36,6 +36,7 @@ app.get("/", (req, res) => {
 
 // setup the /users route
 app.use("/users", require("./routes/user"));
+app.use("/patients", require("./routes/patient"));
 
 // start the express port
 app.listen(5120, () => {
