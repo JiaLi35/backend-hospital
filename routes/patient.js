@@ -9,11 +9,11 @@ const { signup } = require("../controllers/user");
     PUT patient profile
 */
 
-// POST /patients/new-profile-and-signup
-router.post("/new-profile-and-signup", async (req, res) => {
+// POST /patients/new-profile
+router.post("/new-profile", async (req, res) => {
   try {
     const { name, email, nric, phone_number, password } = req.body;
-    const newUser = await signup(name, email, password);
+    const newUser = await signup(name, email, password, (role = "patient"));
     await newPatientProfile(name, email, nric, phone_number, newUser._id);
     // send the user back to create cookie
     res.status(200).send(newUser);

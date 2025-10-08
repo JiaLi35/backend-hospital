@@ -1,10 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const { login, signup } = require("../controllers/user");
+const { login } = require("../controllers/user");
 
 /*
     (login and signup always POST)
-    POST /users/signup
     POST /users/login
 */
 
@@ -19,3 +18,5 @@ router.post("/login", async (req, res) => {
     res.status(400).send({ message: error.message });
   }
 });
+
+module.exports = router;

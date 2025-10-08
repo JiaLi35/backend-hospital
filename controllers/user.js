@@ -45,7 +45,7 @@ const login = async (email, password) => {
   };
 };
 
-const signup = async (name, email, password) => {
+const signup = async (name, email, password, role) => {
   // 1. check if email provided already exists or not
   const user = await getUserByEmail(email);
   // if email exists, throw an error
@@ -60,6 +60,7 @@ const signup = async (name, email, password) => {
     name: name,
     email: email,
     password: bcrypt.hashSync(password, 10), // hash the password with 10 rounds of salt
+    role: role,
   });
 
   // 3. save the user
