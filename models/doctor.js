@@ -27,6 +27,10 @@ const doctorSchema = new Schema({
   biography: {
     type: String,
   },
+  // image to store the doctor's picture
+  image: {
+    type: String,
+  },
   // linkage between the patients and user (similar to SQL foreign key)
   user_id: {
     type: Schema.Types.ObjectId,

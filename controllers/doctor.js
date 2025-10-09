@@ -31,13 +31,28 @@ const getDoctors = async (specialty) => {
   return doctors;
 };
 
-// GET 1 doctor
-async function getDoctor(id) {
-  return await Doctor.findById(id);
-}
+// GET 1 doctor by user id
+const getDoctor = async (user_id) => {
+  return await Doctor.findOne({ user_id: user_id }).populate("specialty");
+};
+
+// Update doctors
+const updateDoctor = async (id, biography) => {
+  const updatedDoctor = await Doctor.findByIdAndUpdate(
+    id,
+    {
+      biography: biography,
+    },
+    {
+      new: true,
+    }
+  );
+  return updatedDoctor;
+};
 
 module.exports = {
   newDoctorProfile,
   getDoctors,
   getDoctor,
+  updateDoctor,
 };

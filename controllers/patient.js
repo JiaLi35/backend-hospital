@@ -16,6 +16,27 @@ const newPatientProfile = async (name, email, nric, phone_number, user_id) => {
   return newPatientProfile;
 };
 
+// GET patient profile (1 patient)
+const getPatient = async (user_id) => {
+  return await Patient.findOne({ user_id: user_id });
+};
+
+// update patient profile details
+const updatePatient = async (id, phone_number) => {
+  const updatedPatient = await Patient.findByIdAndUpdate(
+    id,
+    {
+      phone_number,
+    },
+    {
+      new: true,
+    }
+  );
+  return updatedPatient;
+};
+
 module.exports = {
   newPatientProfile,
+  getPatient,
+  updatePatient,
 };

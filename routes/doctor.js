@@ -4,6 +4,7 @@ const {
   newDoctorProfile,
   getDoctors,
   getDoctor,
+  updateDoctor,
 } = require("../controllers/doctor");
 const { signup } = require("../controllers/user");
 
@@ -15,7 +16,7 @@ const { signup } = require("../controllers/user");
     PUT doctor profile
 */
 
-// GET doctor profiles (multiple doctors)
+// GET /doctors (multiple doctors)
 router.get("/", async (req, res) => {
   try {
     const specialty = req.query.specialty;
@@ -27,11 +28,11 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET 1 doctor profile
+// GET /doctors/:id (get doctor by user_id)
 router.get("/:id", async (req, res) => {
   try {
-    const id = req.params.id;
-    const doctor = await getDoctor(id);
+    const user_id = req.params.id;
+    const doctor = await getDoctor(user_id);
     res.status(200).send(doctor);
   } catch (error) {
     console.log(error);
@@ -47,6 +48,19 @@ router.post("/new-profile", async (req, res) => {
     await newDoctorProfile(name, email, specialty, newUser._id);
     // DON'T CREATE COOKIE FROM THIS BECAUSE ADMIN IS ADDING THESE DOCTORS (don't want to log admin out and login doctor acc)
     res.status(200).send(newUser);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({ message: error.message });
+  }
+});
+
+// PUT /doctors/:id/update-profile
+router.put("/update-profile/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const biography = req.body.biography;
+    const udpatedDoctor = await updateDoctor(id, biography);
+    res.status(200).send(udpatedDoctor);
   } catch (error) {
     console.log(error);
     res.status(400).send({ message: error.message });

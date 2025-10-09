@@ -19,7 +19,7 @@ app.use(cors());
 async function connectToMongoDB() {
   try {
     // wait for the MongoDB to connect
-    await mongoose.connect("mongodb://localhost:27017/hospital");
+    await mongoose.connect(process.env.MONGODB_URL + "/hospital");
     console.log("MongoDB is connected");
   } catch (error) {
     console.log(error);
@@ -30,15 +30,18 @@ async function connectToMongoDB() {
 connectToMongoDB();
 
 // setup root route
-app.get("/", (req, res) => {
+app.get("/api", (req, res) => {
   res.send("Hello world");
 });
 
 // setup the /users route
-app.use("/users", require("./routes/user"));
-app.use("/patients", require("./routes/patient"));
-app.use("/doctors", require("./routes/doctor"));
-app.use("/specialties", require("./routes/specialty"));
+app.use("/api/users", require("./routes/user"));
+app.use("/api/patients", require("./routes/patient"));
+app.use("/api/doctors", require("./routes/doctor"));
+app.use("/api/specialties", require("./routes/specialty"));
+
+// set a folder as a static path
+app.use("/api/uploads", express.static("uploads"));
 
 // start the express port
 app.listen(5120, () => {

@@ -1,6 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { newPatientProfile } = require("../controllers/patient");
+const {
+  newPatientProfile,
+  getPatient,
+  updatePatient,
+} = require("../controllers/patient");
 const { signup } = require("../controllers/user");
 /* 
     Routes: 
@@ -17,6 +21,31 @@ router.post("/new-profile", async (req, res) => {
     await newPatientProfile(name, email, nric, phone_number, newUser._id);
     // send the user back to create cookie
     res.status(200).send(newUser);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({ message: error.message });
+  }
+});
+
+// GET /patients/:id
+router.get("/:id", async (req, res) => {
+  try {
+    const user_id = req.params.id;
+    const patient = await getPatient(user_id);
+    res.status(200).send(patient);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({ message: error.message });
+  }
+});
+
+// PUT patients/update-profile/:id
+router.put("/update-profile/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const phone_number = req.body.phone_number;
+    const updatedPatient = await updatePatient(id, phone_number);
+    res.status(200).send(updatedPatient);
   } catch (error) {
     console.log(error);
     res.status(400).send({ message: error.message });
