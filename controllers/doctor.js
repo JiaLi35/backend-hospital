@@ -37,11 +37,12 @@ const getDoctor = async (user_id) => {
 };
 
 // Update doctors
-const updateDoctor = async (id, biography) => {
+const updateDoctor = async (id, biography, image) => {
   const updatedDoctor = await Doctor.findByIdAndUpdate(
     id,
     {
       biography: biography,
+      image: image,
     },
     {
       new: true,

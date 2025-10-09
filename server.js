@@ -39,6 +39,7 @@ app.use("/api/users", require("./routes/user"));
 app.use("/api/patients", require("./routes/patient"));
 app.use("/api/doctors", require("./routes/doctor"));
 app.use("/api/specialties", require("./routes/specialty"));
+app.use("/api/images", require("./routes/image"));
 
 // set a folder as a static path
 app.use("/api/uploads", express.static("uploads"));

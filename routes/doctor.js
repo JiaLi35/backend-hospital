@@ -59,7 +59,8 @@ router.put("/update-profile/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const biography = req.body.biography;
-    const udpatedDoctor = await updateDoctor(id, biography);
+    const image = req.body.image;
+    const udpatedDoctor = await updateDoctor(id, biography, image);
     res.status(200).send(udpatedDoctor);
   } catch (error) {
     console.log(error);
