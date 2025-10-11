@@ -1,10 +1,12 @@
 const express = require("express");
 const router = express.Router();
+const { isAdmin, isDoctor } = require("../middleware/auth.js");
 const {
   newDoctorProfile,
   getDoctors,
   getDoctor,
   updateDoctor,
+  getDoctorById,
 } = require("../controllers/doctor");
 const { signup } = require("../controllers/user");
 
@@ -29,7 +31,7 @@ router.get("/", async (req, res) => {
 });
 
 // GET /doctors/:id (get doctor by user_id)
-router.get("/:id", async (req, res) => {
+router.get("/user/:id", async (req, res) => {
   try {
     const user_id = req.params.id;
     const doctor = await getDoctor(user_id);
@@ -40,8 +42,20 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+// GET /doctors/:id (get doctor by id)
+router.get("/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const doctor = await getDoctorById(id);
+    res.status(200).send(doctor);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send(error);
+  }
+});
+
 // POST /doctors/new-profile
-router.post("/new-profile", async (req, res) => {
+router.post("/new-profile", isAdmin, async (req, res) => {
   try {
     const { name, email, specialty, password } = req.body;
     const newUser = await signup(name, email, password, (role = "doctor"));
@@ -55,7 +69,7 @@ router.post("/new-profile", async (req, res) => {
 });
 
 // PUT /doctors/:id/update-profile
-router.put("/update-profile/:id", async (req, res) => {
+router.put("/update-profile/:id", isDoctor, async (req, res) => {
   try {
     const id = req.params.id;
     const biography = req.body.biography;

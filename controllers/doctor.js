@@ -24,16 +24,22 @@ const getDoctors = async (specialty) => {
     filter.specialty = specialty;
   }
 
-  const doctors = await Doctor.find(filter).populate("specialty");
+  const doctors = await Doctor.find(filter)
+    .populate("specialty")
+    .sort({ _id: -1 });
   // .limit(itemsPerPage) // limit the number of items shown
   // .skip((page - 1) * itemsPerPage) // skip the amount of items
-  // .sort({ _id: -1 });
   return doctors;
 };
 
 // GET 1 doctor by user id
 const getDoctor = async (user_id) => {
   return await Doctor.findOne({ user_id: user_id }).populate("specialty");
+};
+
+// GET 1 doctor by id
+const getDoctorById = async (id) => {
+  return await Doctor.findById(id).populate("specialty");
 };
 
 // Update doctors
@@ -55,5 +61,6 @@ module.exports = {
   newDoctorProfile,
   getDoctors,
   getDoctor,
+  getDoctorById,
   updateDoctor,
 };

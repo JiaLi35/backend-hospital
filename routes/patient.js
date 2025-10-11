@@ -6,6 +6,7 @@ const {
   updatePatient,
 } = require("../controllers/patient");
 const { signup } = require("../controllers/user");
+const { isPatient } = require("../middleware/auth");
 /* 
     Routes: 
     POST patient profile 
@@ -40,7 +41,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // PUT patients/update-profile/:id
-router.put("/update-profile/:id", async (req, res) => {
+router.put("/update-profile/:id", isPatient, async (req, res) => {
   try {
     const id = req.params.id;
     const phone_number = req.body.phone_number;
