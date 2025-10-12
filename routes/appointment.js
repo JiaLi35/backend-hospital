@@ -13,6 +13,8 @@ const {
   getAppointmentsByDoctorId,
   getAppointmentsByPatientId,
   getAppointment,
+  updateAppointment,
+  deleteAppointment,
 } = require("../controllers/appointment");
 const { isPatient } = require("../middleware/auth");
 const router = express.Router();
@@ -71,6 +73,38 @@ router.post("/new-appointment", isPatient, async (req, res) => {
       patientId
     );
     res.status(200).send(bookNewAppointment);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({ message: error.message });
+  }
+});
+
+// PUT /appointments/:id
+router.put("/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { doctorId, patientId, dateTime } = req.body;
+    const updatedAppointment = await updateAppointment(
+      id,
+      doctorId,
+      patientId,
+      dateTime
+    );
+    res.status(200).send(updatedAppointment);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({ message: error.message });
+  }
+});
+
+// DELETE /appointments/:id
+router.delete("/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    await deleteAppointment(id);
+    res
+      .status(200)
+      .send({ message: `Appointment with ${id} deleted successfully` });
   } catch (error) {
     console.log(error);
     res.status(400).send({ message: error.message });
