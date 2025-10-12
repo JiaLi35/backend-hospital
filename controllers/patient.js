@@ -21,6 +21,11 @@ const getPatient = async (user_id) => {
   return await Patient.findOne({ user_id: user_id });
 };
 
+// GET 1 doctor by id
+const getPatientById = async (id) => {
+  return await Patient.findById(id);
+};
+
 // update patient profile details
 const updatePatient = async (id, phone_number) => {
   const updatedPatient = await Patient.findByIdAndUpdate(
@@ -38,5 +43,6 @@ const updatePatient = async (id, phone_number) => {
 module.exports = {
   newPatientProfile,
   getPatient,
+  getPatientById,
   updatePatient,
 };

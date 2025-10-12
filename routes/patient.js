@@ -4,6 +4,7 @@ const {
   newPatientProfile,
   getPatient,
   updatePatient,
+  getPatientById,
 } = require("../controllers/patient");
 const { signup } = require("../controllers/user");
 const { isPatient } = require("../middleware/auth");
@@ -28,11 +29,23 @@ router.post("/new-profile", async (req, res) => {
   }
 });
 
-// GET /patients/:id
-router.get("/:id", async (req, res) => {
+// GET /patients/user/:id (get patient by user_id)
+router.get("/user/:id", async (req, res) => {
   try {
     const user_id = req.params.id;
     const patient = await getPatient(user_id);
+    res.status(200).send(patient);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({ message: error.message });
+  }
+});
+
+// GET /patients/:id (get patient by patient id)
+router.get("/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const patient = await getPatientById(id);
     res.status(200).send(patient);
   } catch (error) {
     console.log(error);

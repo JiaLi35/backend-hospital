@@ -14,10 +14,11 @@ const {
   getAppointmentsByPatientId,
   getAppointment,
 } = require("../controllers/appointment");
+const { isPatient } = require("../middleware/auth");
 const router = express.Router();
 
-// GET /appointments/doctor-appointment/:id (get doctor's appointments by doctor id)
-router.get("/doctor-appointment/:id", async (req, res) => {
+// GET /appointments/doctor-appointments/:id (get doctor's appointments by doctor id)
+router.get("/doctor-appointments/:id", async (req, res) => {
   try {
     const doctorId = req.params.id;
     const status = req.query.status;
@@ -32,8 +33,8 @@ router.get("/doctor-appointment/:id", async (req, res) => {
   }
 });
 
-// GET /appointments/patient-appointment/:id (get patient's appointments by patient id)
-router.get("/patient-appointment/:id", async (req, res) => {
+// GET /appointments/patient-appointments/:id (get patient's appointments by patient id)
+router.get("/patient-appointments/:id", async (req, res) => {
   try {
     const patientId = req.params.id;
     const status = req.query.status;
@@ -60,30 +61,14 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// POST /appointments/new-profile
-router.post("/new-appointment", async (req, res) => {
+// POST /appointments/new-appointment
+router.post("/new-appointment", isPatient, async (req, res) => {
   try {
-    const {
-      doctorId,
-      doctorName,
-      specialty,
-      dateTime,
-      patientId,
-      patientName,
-      email,
-      phone_number,
-      nric,
-    } = req.body;
+    const { doctorId, dateTime, patientId } = req.body;
     const bookNewAppointment = await newAppointment(
       doctorId,
-      doctorName,
-      specialty,
       dateTime,
-      patientId,
-      patientName,
-      email,
-      phone_number,
-      nric
+      patientId
     );
     res.status(200).send(bookNewAppointment);
   } catch (error) {

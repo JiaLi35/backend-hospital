@@ -17,7 +17,17 @@ const getAppointmentsByDoctorId = async (doctorId, status) => {
     filter.status = status;
   }
   const appointments = await Appointment.find(filter)
-    .populate("specialty")
+    .populate([
+      {
+        path: "patientId",
+      },
+      {
+        path: "doctorId",
+        populate: {
+          path: "specialty",
+        },
+      },
+    ])
     .sort({ _id: -1 });
   return appointments;
 };
@@ -33,36 +43,79 @@ const getAppointmentsByPatientId = async (patientId, status) => {
   }
 
   const appointments = await Appointment.find(filter)
-    .populate("specialty")
+    .populate([
+      {
+        path: "patientId",
+      },
+      {
+        path: "doctorId",
+        populate: {
+          path: "specialty",
+        },
+      },
+    ])
     .sort({ _id: -1 });
   return appointments;
 };
 
 const getAppointment = async (id) => {
-  return await Appointment.findById(id).populate("specialty");
+  return await Appointment.findById(id).populate([
+    {
+      path: "patientId",
+    },
+    {
+      path: "doctorId",
+      populate: {
+        path: "specialty",
+      },
+    },
+  ]);
 };
 
-const newAppointment = async (
-  doctorId,
-  doctorName,
-  specialty,
-  dateTime,
-  patientId,
-  patientName,
-  email,
-  phone_number,
-  nric
-) => {
+const newAppointment = async (doctorId, dateTime, patientId) => {
+  // Convert appointmentDate to a Date object
+  const date = new Date(dateTime);
+
+  // Define start and end of that day
+  const startOfDay = new Date(date.setHours(0, 0, 0, 0));
+  const endOfDay = new Date(date.setHours(23, 59, 59, 999));
+
+  // Check if patient already has an appointment booked that day
+  const existingPatientAppointment = await Appointment.findOne({
+    doctorId,
+    patientId,
+    dateTime: { $gte: startOfDay, $lte: endOfDay },
+    status: { $ne: "cancelled" }, // optional: ignore cancelled appointments
+  });
+
+  // Check if patient already has an appointment booked that day
+  const existingPatientAppointmentsigma = await Appointment.findOne({
+    patientId,
+    dateTime: new Date(dateTime),
+    status: { $ne: "cancelled" }, // optional: ignore cancelled appointments
+  });
+
+  // Check if that timeslot (of that day) has already been booked
+  const existingDoctorAppointment = await Appointment.findOne({
+    doctorId,
+    dateTime: new Date(dateTime),
+    status: { $ne: "cancelled" }, // optional: ignore cancelled appointments
+  });
+
+  if (existingPatientAppointment) {
+    throw new Error(
+      "An appointment on this day for this doctor already exists"
+    );
+  } else if (existingDoctorAppointment) {
+    throw new Error("This timeslot has already been taken.");
+  } else if (existingPatientAppointmentsigma) {
+    throw new Error("You already have an appointment at this time.");
+  }
+
   const newAppointment = new Appointment({
     doctorId,
-    doctorName,
-    specialty,
     dateTime,
     patientId,
-    patientName,
-    email,
-    phone_number,
-    nric,
   });
 
   await newAppointment.save();

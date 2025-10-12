@@ -22,15 +22,6 @@ const appointmentSchema = new Schema({
     ref: "Doctor",
     required: true,
   },
-  doctorName: {
-    type: String,
-    required: true,
-  },
-  specialty: {
-    type: Schema.Types.ObjectId,
-    ref: "Specialty",
-    required: true,
-  },
   medical_concern: {
     type: String,
   },
@@ -42,22 +33,6 @@ const appointmentSchema = new Schema({
     // linkage between the appointments and patients (similar to SQL foreign key)
     type: Schema.Types.ObjectId,
     ref: "Patient",
-    required: true,
-  },
-  patientName: {
-    type: String,
-    required: true,
-  },
-  email: {
-    type: String,
-    required: true,
-  },
-  phone_number: {
-    type: String,
-    required: true,
-  },
-  nric: {
-    type: String,
     required: true,
   },
   status: {
