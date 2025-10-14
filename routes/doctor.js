@@ -9,7 +9,7 @@ const {
   getDoctorById,
   deleteDoctor,
 } = require("../controllers/doctor");
-const { signup } = require("../controllers/user");
+const { signup, deleteUser } = require("../controllers/user");
 
 /* 
     Routes: 
@@ -83,10 +83,12 @@ router.put("/update-profile/:id", isDoctor, async (req, res) => {
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", isAdmin, async (req, res) => {
   try {
     const id = req.params.id;
+    const doctor = await getDoctorById(id);
     await deleteDoctor(id);
+    await deleteUser(doctor.user_id);
     res.status(200).send({ message: `Doctor with id ${id} has been deleted` });
   } catch (error) {
     console.log(error);

@@ -88,8 +88,13 @@ const signup = async (name, email, password, role) => {
   };
 };
 
+const deleteUser = async (id) => {
+  return await User.findByIdAndDelete(id);
+};
+
 module.exports = {
   getUserByEmail,
   login,
   signup,
+  deleteUser,
 };
