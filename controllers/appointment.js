@@ -9,6 +9,30 @@
 
 const Appointment = require("../models/appointment");
 
+const getAppointments = async (status) => {
+  // filter for specialty
+  let filter = {};
+
+  if (status) {
+    filter.status = status;
+  }
+
+  const appointments = await Appointment.find(filter)
+    .populate([
+      {
+        path: "patientId",
+      },
+      {
+        path: "doctorId",
+        populate: {
+          path: "specialty",
+        },
+      },
+    ])
+    .sort({ _id: -1 });
+  return appointments;
+};
+
 const getAppointmentsByDoctorId = async (doctorId, status) => {
   // filter for specialty
   let filter = { doctorId: doctorId };
@@ -82,7 +106,7 @@ const newAppointment = async (doctorId, dateTime, patientId) => {
   const endOfDay = new Date(date.setHours(23, 59, 59, 999));
 
   // Check if patient already has an appointment booked that day
-  const existingPatientAppointment = await Appointment.findOne({
+  const existingPatientAppointmentWithDoctor = await Appointment.findOne({
     doctorId,
     patientId,
     dateTime: { $gte: startOfDay, $lte: endOfDay },
@@ -90,7 +114,7 @@ const newAppointment = async (doctorId, dateTime, patientId) => {
   });
 
   // Check if patient already has an appointment booked that day
-  const existingPatientAppointmentsigma = await Appointment.findOne({
+  const existingPatientAppointment = await Appointment.findOne({
     patientId,
     dateTime: new Date(dateTime),
     status: { $ne: "cancelled" }, // optional: ignore cancelled appointments
@@ -103,13 +127,13 @@ const newAppointment = async (doctorId, dateTime, patientId) => {
     status: { $ne: "cancelled" }, // optional: ignore cancelled appointments
   });
 
-  if (existingPatientAppointment) {
+  if (existingPatientAppointmentWithDoctor) {
     throw new Error(
       "An appointment on this day for this doctor already exists"
     );
   } else if (existingDoctorAppointment) {
     throw new Error("This timeslot has already been taken.");
-  } else if (existingPatientAppointmentsigma) {
+  } else if (existingPatientAppointment) {
     throw new Error("You already have an appointment at this time.");
   }
 
@@ -158,16 +182,39 @@ const updateAppointment = async (id, doctorId, patientId, dateTime) => {
   return updatedAppointment;
 };
 
+const completeAppointment = async (id) => {
+  const completedAppointment = await Appointment.findByIdAndUpdate(
+    id,
+    {
+      status: "completed",
+    },
+    { new: true }
+  );
+  return completedAppointment;
+};
+
+const cancelAppointment = async (id) => {
+  const cancelledAppointment = await Appointment.findByIdAndUpdate(
+    id,
+    { status: "cancelled" },
+    { status: true }
+  );
+  return cancelledAppointment;
+};
+
 // Delete appointments based on appointment ID
 const deleteAppointment = async (id) => {
   return await Appointment.findByIdAndDelete(id);
 };
 
 module.exports = {
+  getAppointments,
   getAppointmentsByDoctorId,
   getAppointmentsByPatientId,
   getAppointment,
   newAppointment,
   updateAppointment,
+  cancelAppointment,
+  completeAppointment,
   deleteAppointment,
 };

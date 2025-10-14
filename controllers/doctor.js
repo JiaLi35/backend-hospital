@@ -1,4 +1,5 @@
 // import model
+const Appointment = require("../models/appointment");
 const Doctor = require("../models/doctor");
 
 // POST to doctor profile information to doctors table
@@ -57,10 +58,25 @@ const updateDoctor = async (id, biography, image) => {
   return updatedDoctor;
 };
 
+// delete doctor
+const deleteDoctor = async (id) => {
+  const existingAppointment = await Appointment.findOne({
+    doctorId: id,
+    status: { $nin: ["cancelled", "completed"] },
+  });
+
+  if (existingAppointment) {
+    throw new Error("This doctor still has a pending appointment.");
+  }
+
+  return await Doctor.findByIdAndDelete(id);
+};
+
 module.exports = {
   newDoctorProfile,
   getDoctors,
   getDoctor,
   getDoctorById,
   updateDoctor,
+  deleteDoctor,
 };

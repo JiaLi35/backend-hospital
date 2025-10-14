@@ -15,9 +15,23 @@ const {
   getAppointment,
   updateAppointment,
   deleteAppointment,
+  completeAppointment,
+  cancelAppointment,
+  getAppointments,
 } = require("../controllers/appointment");
-const { isPatient } = require("../middleware/auth");
+const { isPatient, isAdmin, isDoctor } = require("../middleware/auth");
 const router = express.Router();
+
+router.get("/", async (req, res) => {
+  try {
+    const status = req.query.status;
+    const appointments = await getAppointments(status);
+    res.status(200).send(appointments);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send(error);
+  }
+});
 
 // GET /appointments/doctor-appointments/:id (get doctor's appointments by doctor id)
 router.get("/doctor-appointments/:id", async (req, res) => {
@@ -63,7 +77,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// POST /appointments/new-appointment
+// POST /appointments/new-appointment (patient only can book)
 router.post("/new-appointment", isPatient, async (req, res) => {
   try {
     const { doctorId, dateTime, patientId } = req.body;
@@ -79,8 +93,8 @@ router.post("/new-appointment", isPatient, async (req, res) => {
   }
 });
 
-// PUT /appointments/:id
-router.put("/:id", async (req, res) => {
+// PUT /appointments/:id (patients / doctors can reschedule)  (how to check middleware for this)
+router.put("/update-appointment/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const { doctorId, patientId, dateTime } = req.body;
@@ -97,8 +111,32 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+// PUT /appointments/complete-appointment/:id (doctor marks appointment as completed)
+router.put("/complete-appointment/:id", isDoctor, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const completedAppointment = await completeAppointment(id);
+    res.status(200).send(completedAppointment);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({ message: error.message });
+  }
+});
+
+// PUT /appointments/cancel-appointment/:id (patient / doctor cancels appointment) (how to check middleware for this)
+router.put("/cancel-appointment/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const cancelledAppointment = await cancelAppointment(id);
+    res.status(200).send(cancelledAppointment);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({ message: error.message });
+  }
+});
+
 // DELETE /appointments/:id
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", isAdmin, async (req, res) => {
   try {
     const id = req.params.id;
     await deleteAppointment(id);

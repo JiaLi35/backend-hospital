@@ -1,3 +1,4 @@
+const Doctor = require("../models/doctor");
 const Specialty = require("../models/specialty");
 
 const getSpecialties = async () => {
@@ -34,6 +35,14 @@ const updateSpecialty = async (id, specialty) => {
 };
 
 const deleteSpecialty = async (id) => {
+  const existingSpecialty = await Doctor.findOne({
+    specialty: id,
+  });
+
+  if (existingSpecialty) {
+    throw new Error("Cannot delete specialty as it is linked to a doctor.");
+  }
+
   return await Specialty.findByIdAndDelete(id);
 };
 

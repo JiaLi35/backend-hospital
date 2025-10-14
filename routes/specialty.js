@@ -79,9 +79,7 @@ router.delete("/:id", async (req, res) => {
       .send({ message: `Specialty with id ${id} has been deleted` });
   } catch (error) {
     console.log(error);
-    res
-      .status(400)
-      .send({ message: "Something went wrong. Could not delete specialty." });
+    res.status(400).send({ message: error.message });
   }
 });
 

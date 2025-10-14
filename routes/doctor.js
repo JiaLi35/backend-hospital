@@ -7,6 +7,7 @@ const {
   getDoctor,
   updateDoctor,
   getDoctorById,
+  deleteDoctor,
 } = require("../controllers/doctor");
 const { signup } = require("../controllers/user");
 
@@ -76,6 +77,17 @@ router.put("/update-profile/:id", isDoctor, async (req, res) => {
     const image = req.body.image;
     const udpatedDoctor = await updateDoctor(id, biography, image);
     res.status(200).send(udpatedDoctor);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({ message: error.message });
+  }
+});
+
+router.delete("/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    await deleteDoctor(id);
+    res.status(200).send({ message: `Doctor with id ${id} has been deleted` });
   } catch (error) {
     console.log(error);
     res.status(400).send({ message: error.message });
