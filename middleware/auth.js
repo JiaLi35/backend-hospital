@@ -2,33 +2,6 @@
 const jwt = require("jsonwebtoken");
 const { getUserByEmail } = require("../controllers/user");
 
-// to check if the user is a valid user (control whether anyone who calls the API is a valid logged in user)
-const isPatient = async (req, res, next) => {
-  try {
-    const { authorization = "" } = req.headers;
-    // 1. extract the token from authorization header
-    // method 1 - .replace
-    const token = authorization.replace("Bearer ", "");
-    // 2. verify the token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    // 3. get the user data by email
-    const user = await getUserByEmail(decoded.email);
-    // 4. verify if user exists
-    if (user && user.role === "patient") {
-      // add the user data into the request
-      req.user = user;
-      // trigger the next function
-      next();
-    } else {
-      // trigger error if not admin
-      res.status(400).send({ error: "YOU SHALL NOT PASS" });
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(400).send({ error: "YOU SHALL NOT PASS" });
-  }
-};
-
 // to check if the user is an admin or not
 const isAdmin = async (req, res, next) => {
   try {
@@ -55,6 +28,33 @@ const isAdmin = async (req, res, next) => {
   }
 };
 
+// to check if the user is a valid user (control whether anyone who calls the API is a valid logged in user)
+const isPatient = async (req, res, next) => {
+  try {
+    const { authorization = "" } = req.headers;
+    // 1. extract the token from authorization header
+    // method 1 - .replace
+    const token = authorization.replace("Bearer ", "");
+    // 2. verify the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // 3. get the user data by email
+    const user = await getUserByEmail(decoded.email);
+    // 4. verify if user exists
+    if (user && user.role === "patient") {
+      // add the user data into the request
+      req.user = user;
+      // trigger the next function
+      next();
+    } else {
+      // trigger error if not admin
+      res.status(400).send({ error: "YOU SHALL NOT PASS" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({ message: error.message });
+  }
+};
+
 // to check if the user is a doctor or not
 const isDoctor = async (req, res, next) => {
   try {
@@ -77,12 +77,38 @@ const isDoctor = async (req, res, next) => {
     }
   } catch (error) {
     console.log(error);
-    res.status(400).send({ error: "YOU SHALL NOT PASS" });
+    res.status(400).send({ message: error.message });
+  }
+};
+
+const isDoctorOrPatient = async (req, res, next) => {
+  try {
+    const { authorization = "" } = req.headers;
+    /* step 1: extract the token from authorization header */
+    // method 1: using .replace
+    const token = authorization.replace("Bearer ", "");
+    // 2. verify the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // 3. get the user data by email
+    const user = await getUserByEmail(decoded.email);
+    // 4. verify if the user exists and is a doctor
+    if (user && (user.role === "doctor" || user.role === "patient")) {
+      // add the user data into the request
+      req.user = user;
+      // trigger the next function
+      next();
+    } else {
+      res.status(400).send({ error: "YOU SHALL NOT PASS" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({ message: error.message });
   }
 };
 
 module.exports = {
-  isDoctor,
   isAdmin,
+  isDoctor,
   isPatient,
+  isDoctorOrPatient,
 };

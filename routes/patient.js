@@ -8,6 +8,7 @@ const {
 } = require("../controllers/patient");
 const { signup } = require("../controllers/user");
 const { isPatient } = require("../middleware/auth");
+
 /* 
     Routes: 
     POST patient profile 

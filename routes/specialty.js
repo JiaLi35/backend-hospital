@@ -8,6 +8,7 @@ const {
   updateSpecialty,
   deleteSpecialty,
 } = require("../controllers/specialty");
+const { isAdmin } = require("../middleware/auth");
 
 /*
     GET /specialties
@@ -41,7 +42,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // add Specialty
-router.post("/", async (req, res) => {
+router.post("/", isAdmin, async (req, res) => {
   try {
     const specialty = req.body.specialty;
     const newSpecialty = await addNewSpecialty(specialty);
@@ -55,7 +56,7 @@ router.post("/", async (req, res) => {
 });
 
 // update specialty
-router.put("/:id", async (req, res) => {
+router.put("/:id", isAdmin, async (req, res) => {
   try {
     const id = req.params.id;
     const specialty = req.body.specialty;
@@ -70,7 +71,7 @@ router.put("/:id", async (req, res) => {
 });
 
 // delete specialty
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", isAdmin, async (req, res) => {
   try {
     const id = req.params.id;
     await deleteSpecialty(id);

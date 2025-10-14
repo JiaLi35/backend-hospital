@@ -19,9 +19,15 @@ const {
   cancelAppointment,
   getAppointments,
 } = require("../controllers/appointment");
-const { isPatient, isAdmin, isDoctor } = require("../middleware/auth");
+const {
+  isPatient,
+  isAdmin,
+  isDoctor,
+  isDoctorOrPatient,
+} = require("../middleware/auth");
 const router = express.Router();
 
+// GET /appointments
 router.get("/", async (req, res) => {
   try {
     const status = req.query.status;
@@ -94,7 +100,7 @@ router.post("/new-appointment", isPatient, async (req, res) => {
 });
 
 // PUT /appointments/:id (patients / doctors can reschedule)  (how to check middleware for this)
-router.put("/update-appointment/:id", async (req, res) => {
+router.put("/update-appointment/:id", isDoctorOrPatient, async (req, res) => {
   try {
     const id = req.params.id;
     const { doctorId, patientId, dateTime } = req.body;
@@ -124,7 +130,7 @@ router.put("/complete-appointment/:id", isDoctor, async (req, res) => {
 });
 
 // PUT /appointments/cancel-appointment/:id (patient / doctor cancels appointment) (how to check middleware for this)
-router.put("/cancel-appointment/:id", async (req, res) => {
+router.put("/cancel-appointment/:id", isDoctorOrPatient, async (req, res) => {
   try {
     const id = req.params.id;
     const cancelledAppointment = await cancelAppointment(id);
