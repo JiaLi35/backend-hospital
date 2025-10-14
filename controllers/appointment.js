@@ -29,7 +29,7 @@ const getAppointments = async (status) => {
         },
       },
     ])
-    .sort({ _id: -1 });
+    .sort({ dateTime: 1 });
   return appointments;
 };
 
@@ -52,7 +52,7 @@ const getAppointmentsByDoctorId = async (doctorId, status) => {
         },
       },
     ])
-    .sort({ _id: -1 });
+    .sort({ dateTime: -1 });
   return appointments;
 };
 
@@ -78,7 +78,7 @@ const getAppointmentsByPatientId = async (patientId, status) => {
         },
       },
     ])
-    .sort({ _id: -1 });
+    .sort({ dateTime: -1 });
   return appointments;
 };
 
