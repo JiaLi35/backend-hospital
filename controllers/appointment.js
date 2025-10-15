@@ -30,6 +30,8 @@ const getAppointments = async (status) => {
       },
     ])
     .sort({ dateTime: 1 });
+  // .limit(itemsPerPage) // limit the number of items shown
+  // .skip((page - 1) * itemsPerPage) // skip the amount of items
   return appointments;
 };
 
@@ -52,7 +54,7 @@ const getAppointmentsByDoctorId = async (doctorId, status) => {
         },
       },
     ])
-    .sort({ dateTime: -1 });
+    .sort({ dateTime: 1 });
   return appointments;
 };
 
@@ -78,7 +80,7 @@ const getAppointmentsByPatientId = async (patientId, status) => {
         },
       },
     ])
-    .sort({ dateTime: -1 });
+    .sort({ dateTime: 1 });
   return appointments;
 };
 
@@ -147,8 +149,23 @@ const newAppointment = async (doctorId, dateTime, patientId) => {
   return newAppointment;
 };
 
-// Update your existing appointment (date time only)
+// Reschedule your existing appointment (date time only)
 const updateAppointment = async (id, doctorId, patientId, dateTime) => {
+  // // Convert appointmentDate to a Date object
+  // const date = new Date(dateTime);
+
+  // // Define start and end of that day
+  // const startOfDay = new Date(date.setHours(0, 0, 0, 0));
+  // const endOfDay = new Date(date.setHours(23, 59, 59, 999));
+
+  // // Check if patient already has an appointment booked that day
+  // const existingPatientAppointmentWithDoctor = await Appointment.findOne({
+  //   doctorId,
+  //   patientId,
+  //   dateTime: { $gte: startOfDay, $lte: endOfDay },
+  //   status: { $ne: "cancelled" }, // optional: ignore cancelled appointments
+  // });
+
   // Check if patient already has an appointment booked that day
   const existingPatientAppointment = await Appointment.findOne({
     patientId,
@@ -168,12 +185,17 @@ const updateAppointment = async (id, doctorId, patientId, dateTime) => {
   } else if (existingDoctorAppointment) {
     throw new Error("This timeslot has already been taken by another patient.");
   }
+  // } else if (existingPatientAppointmentWithDoctor) {
+  //   throw new Error(
+  //     "An appointment on this day for this doctor already exists"
+  //   );
+  // }
 
   const updatedAppointment = await Appointment.findByIdAndUpdate(
     id,
     {
       dateTime,
-      status: "rescheduled",
+      status: "scheduled",
     },
     {
       new: true,
@@ -197,9 +219,18 @@ const cancelAppointment = async (id) => {
   const cancelledAppointment = await Appointment.findByIdAndUpdate(
     id,
     { status: "cancelled" },
-    { status: true }
+    { new: true }
   );
   return cancelledAppointment;
+};
+
+const checkInAppointment = async (id) => {
+  const checkedInAppointment = await Appointment.findByIdAndUpdate(
+    id,
+    { status: "checked-in" },
+    { new: true }
+  );
+  return checkedInAppointment;
 };
 
 // Delete appointments based on appointment ID
@@ -216,5 +247,6 @@ module.exports = {
   updateAppointment,
   cancelAppointment,
   completeAppointment,
+  checkInAppointment,
   deleteAppointment,
 };

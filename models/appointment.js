@@ -22,9 +22,6 @@ const appointmentSchema = new Schema({
     ref: "Doctor",
     required: true,
   },
-  medical_concern: {
-    type: String,
-  },
   dateTime: {
     type: Date,
     required: true,
@@ -37,7 +34,7 @@ const appointmentSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ["scheduled", "completed", "rescheduled", "cancelled"], // enum to control the value for role (no random roles)
+    enum: ["scheduled", "completed", "cancelled", "checked-in"], // enum to control the value for role (no random roles)
     default: "scheduled",
     required: true,
   },

@@ -25,6 +25,7 @@ const {
   isDoctor,
   isDoctorOrPatient,
 } = require("../middleware/auth");
+const { deleteQueueNumber } = require("../controllers/queue");
 const router = express.Router();
 
 // GET /appointments
@@ -110,6 +111,7 @@ router.put("/update-appointment/:id", isDoctorOrPatient, async (req, res) => {
       patientId,
       dateTime
     );
+    await deleteQueueNumber(id);
     res.status(200).send(updatedAppointment);
   } catch (error) {
     console.log(error);
@@ -122,6 +124,7 @@ router.put("/complete-appointment/:id", isDoctor, async (req, res) => {
   try {
     const id = req.params.id;
     const completedAppointment = await completeAppointment(id);
+    await deleteQueueNumber(id);
     res.status(200).send(completedAppointment);
   } catch (error) {
     console.log(error);
@@ -134,6 +137,7 @@ router.put("/cancel-appointment/:id", isDoctorOrPatient, async (req, res) => {
   try {
     const id = req.params.id;
     const cancelledAppointment = await cancelAppointment(id);
+    await deleteQueueNumber(id);
     res.status(200).send(cancelledAppointment);
   } catch (error) {
     console.log(error);

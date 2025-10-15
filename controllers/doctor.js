@@ -28,8 +28,6 @@ const getDoctors = async (specialty) => {
   const doctors = await Doctor.find(filter)
     .populate("specialty")
     .sort({ _id: -1 });
-  // .limit(itemsPerPage) // limit the number of items shown
-  // .skip((page - 1) * itemsPerPage) // skip the amount of items
   return doctors;
 };
 
