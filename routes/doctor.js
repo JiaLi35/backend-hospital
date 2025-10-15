@@ -10,6 +10,9 @@ const {
   deleteDoctor,
 } = require("../controllers/doctor");
 const { signup, deleteUser } = require("../controllers/user");
+const {
+  deleteAppointmentByDoctorId,
+} = require("../controllers/appointment.js");
 
 /* 
     Routes: 
@@ -88,6 +91,7 @@ router.delete("/:id", isAdmin, async (req, res) => {
     const id = req.params.id;
     const doctor = await getDoctorById(id);
     await deleteDoctor(id);
+    await deleteAppointmentByDoctorId(id);
     await deleteUser(doctor.user_id);
     res.status(200).send({ message: `Doctor with id ${id} has been deleted` });
   } catch (error) {

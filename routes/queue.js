@@ -6,9 +6,10 @@ const {
   getPatientQueueNumber,
 } = require("../controllers/queue");
 const { checkInAppointment } = require("../controllers/appointment");
+const { isPatient } = require("../middleware/auth");
 
 // POST /api/queues
-router.post("/", async (req, res) => {
+router.post("/", isPatient, async (req, res) => {
   try {
     const { doctorId, patientId, appointmentId } = req.body;
     const newQueueNumber = await addQueueNumber(
@@ -47,8 +48,5 @@ router.get("/patient-queue-number/:id", async (req, res) => {
     res.status(400).send({ message: error.message });
   }
 });
-
-// DELETE queue number when completing an appointment.
-// router.delete("/delete-queue-number", )
 
 module.exports = router;

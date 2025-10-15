@@ -49,12 +49,9 @@ const getPatientQueueNumber = async (appointmentId) => {
 };
 
 const deleteQueueNumber = async (appointmentId) => {
-  const previousQueue = await Queue.findOne({
+  return await Queue.deleteOne({
     appointment: appointmentId,
   });
-  if (previousQueue) {
-    return await Queue.findByIdAndDelete(previousQueue._id);
-  }
 };
 
 module.exports = {

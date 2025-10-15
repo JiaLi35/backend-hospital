@@ -112,21 +112,21 @@ const newAppointment = async (doctorId, dateTime, patientId) => {
     doctorId,
     patientId,
     dateTime: { $gte: startOfDay, $lte: endOfDay },
-    status: { $ne: "cancelled" }, // optional: ignore cancelled appointments
+    status: { $nin: ["cancelled", "completed"] }, // optional: ignore cancelled appointments
   });
 
   // Check if patient already has an appointment booked that day
   const existingPatientAppointment = await Appointment.findOne({
     patientId,
     dateTime: new Date(dateTime),
-    status: { $ne: "cancelled" }, // optional: ignore cancelled appointments
+    status: { $nin: ["cancelled", "completed"] }, // optional: ignore cancelled appointments
   });
 
   // Check if that timeslot (of that day) has already been booked
   const existingDoctorAppointment = await Appointment.findOne({
     doctorId,
     dateTime: new Date(dateTime),
-    status: { $ne: "cancelled" }, // optional: ignore cancelled appointments
+    status: { $nin: ["cancelled", "completed"] }, // optional: ignore cancelled appointments
   });
 
   if (existingPatientAppointmentWithDoctor) {
@@ -170,14 +170,14 @@ const updateAppointment = async (id, doctorId, patientId, dateTime) => {
   const existingPatientAppointment = await Appointment.findOne({
     patientId,
     dateTime: new Date(dateTime),
-    status: { $ne: "cancelled" }, // optional: ignore cancelled appointments
+    status: { $nin: ["cancelled", "completed"] }, // optional: ignore cancelled appointments
   });
 
   // Check if that timeslot (of that day) has already been booked
   const existingDoctorAppointment = await Appointment.findOne({
     doctorId,
     dateTime: new Date(dateTime),
-    status: { $ne: "cancelled" }, // optional: ignore cancelled appointments
+    status: { $nin: ["cancelled", "completed"] }, // optional: ignore cancelled appointments
   });
 
   if (existingPatientAppointment) {
@@ -238,6 +238,10 @@ const deleteAppointment = async (id) => {
   return await Appointment.findByIdAndDelete(id);
 };
 
+const deleteAppointmentByDoctorId = async (doctorId) => {
+  await Appointment.deleteMany({ doctorId: doctorId });
+};
+
 module.exports = {
   getAppointments,
   getAppointmentsByDoctorId,
@@ -249,4 +253,5 @@ module.exports = {
   completeAppointment,
   checkInAppointment,
   deleteAppointment,
+  deleteAppointmentByDoctorId,
 };
